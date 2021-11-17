@@ -17,7 +17,7 @@ namespace FactionStealing
 			static std::int32_t GetFavorCost(RE::TESNPC* a_player, RE::TESNPC* a_owner)
 			{
 				using func_t = decltype(&GetFavorCost);
-				REL::Relocation<func_t> func{ REL::ID(23626) };
+				REL::Relocation<func_t> func{ REL::Offset(0x35C2F0) };
 				return func(a_player, a_owner);
 			}
 
@@ -69,12 +69,14 @@ namespace FactionStealing
 
 			return false;
 		}
-		static inline constexpr std::size_t size = 0xAC;
+		
+		//extra inlining
+		static inline constexpr std::size_t size = 0x163;
 	};
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> func{ REL::ID(39584) };
+		REL::Relocation<std::uintptr_t> func{ REL::Offset(0x6DC290) };
 		stl::asm_replace<CanTake>(func.address());
 
 		logger::info("Installed faction stealing tweak"sv);
@@ -103,8 +105,8 @@ namespace AIFadeOut
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::ID(17521), 0x3C5 };
-		stl::write_thunk_call<GetFadeState>(target.address());
+		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x23C1F0) };
+		stl::write_thunk_call<GetFadeState>(target.address() + 0x3DE);
 
 		logger::info("Installed load door fade out tweak"sv);
 	}
@@ -131,8 +133,8 @@ namespace VoiceModulation
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::ID(36541), 0x6F3 };
-		stl::write_thunk_call<SetObjectToFollow>(target.address());
+		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x60E8E0) };
+		stl::write_thunk_call<SetObjectToFollow>(target.address() + 0x7A2);
 
 		logger::info("Installed voice modulation tweak"sv);
 	}
@@ -163,14 +165,14 @@ namespace DopplerShift
 		static DWORD Play(RE::BSAudioManager* a_manager, std::int32_t a_soundID)
 		{
 			using func_t = decltype(&Play);
-			REL::Relocation<func_t> func{ REL::ID(66408) };
+			REL::Relocation<func_t> func{ REL::Offset(0xC144A0) };
 			return func(a_manager, a_soundID);
 		}
 
 		static DWORD Play3D(RE::BSAudioManager* a_manager, std::int32_t a_soundID, std::uint32_t a_unk03)
 		{
 			using func_t = decltype(&Play3D);
-			REL::Relocation<func_t> func{ REL::ID(66409) };
+			REL::Relocation<func_t> func{ REL::Offset(0xC144F0) };
 			return func(a_manager, a_soundID, a_unk03);
 		}
 	};
@@ -179,7 +181,7 @@ namespace DopplerShift
 	{
 		static void Install()
 		{
-			REL::Relocation<std::uintptr_t> func{ REL::ID(66355) };
+			REL::Relocation<std::uintptr_t> func{ REL::Offset(0xC12290) };
 			stl::asm_replace<DefaultSound>(func.address());  //BSSoundHandle::PlaySound
 		}
 
@@ -196,7 +198,7 @@ namespace DopplerShift
 	{
 		static void Install()
 		{
-			REL::Relocation<std::uintptr_t> func{ REL::ID(66356) };
+			REL::Relocation<std::uintptr_t> func{ REL::Offset(0xC122D0) };
 			stl::asm_replace<Dialogue>(func.address());  //BSSoundHandle::PlaySound3D
 		}
 
@@ -436,8 +438,8 @@ namespace ScreenshotToConsole
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::ID(35882), 0xA8 };
-		stl::write_thunk_call<DebugNotification>(target.address());
+		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x5E7150) };
+		stl::write_thunk_call<DebugNotification>(target.address() + 0x9E);
 
 		logger::info("Installed screenshot to console tweak"sv);
 	}
@@ -447,22 +449,22 @@ namespace ScreenshotToConsole
 namespace NoCritSneakMessage
 {
 	inline constexpr std::array<std::pair<std::uintptr_t, std::uintptr_t>, 2> ranges{
-		std::make_pair(0x20D, 0x220),  //crit
-		std::make_pair(0x2D3, 0x2E6),  //sneak
+		std::make_pair(0x328, 0x33B),  //crit
+		std::make_pair(0x3E9, 0x3FC),  //sneak
 	};
 
 	inline void Install(std::uint32_t a_type)
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::ID(37633) };
+		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x64BAB0) };
 
 		switch (a_type) {
 		case 1:
-			for (uintptr_t i = 0x20D; i < 0x220; ++i) {
+			for (uintptr_t i = 0x328; i < 0x33B; ++i) {
 				REL::safe_write(target.address() + i, REL::NOP);
 			}
 			break;
 		case 2:
-			for (uintptr_t i = 0x2D3; i < 0x2E6; ++i) {
+			for (uintptr_t i = 0x3E9; i < 0x3FC; ++i) {
 				REL::safe_write(target.address() + i, REL::NOP);
 			}
 			break;
@@ -489,14 +491,14 @@ namespace SitToWait
 		static bool ProcessMenu(const RE::BSFixedString& a_menuName, RE::UI_MESSAGE_TYPE a_type, bool a_unk03)
 		{
 			using func_t = decltype(&ProcessMenu);
-			REL::Relocation<func_t> func{ REL::ID(80077) };
+			REL::Relocation<func_t> func{ REL::Offset(0xF09AD0) };
 			return func(a_menuName, a_type, a_unk03);
 		}
 
 		static bool CanSleepWait(RE::PlayerCharacter* a_player, RE::TESObjectREFR* a_furniture)
 		{
 			using func_t = decltype(&CanSleepWait);
-			REL::Relocation<func_t> func{ REL::ID(39371) };
+			REL::Relocation<func_t> func{ REL::Offset(0x6C5130) };
 			return func(a_player, a_furniture);
 		}
 
@@ -504,8 +506,9 @@ namespace SitToWait
 		{
 			const auto result = CanSleepWait(a_player, a_furniture);
 			if (result && a_player->GetSitSleepState() != RE::SIT_SLEEP_STATE::kIsSitting) {
-				const auto tweaks = Settings::GetSingleton()->tweaks;
+				const auto& tweaks = Settings::GetSingleton()->tweaks;
 				RE::DebugNotification(tweaks.sitToWait.message.c_str(), "UIMenuCancel");
+				
 				return false;
 			}
 			return result;
@@ -529,8 +532,8 @@ namespace SitToWait
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::ID(51400), 0x394 };
-		stl::write_thunk_call<HandleWaitRequest>(target.address());
+		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x8D9710) };
+		stl::write_thunk_call<HandleWaitRequest>(target.address() + 0x379);
 
 		logger::info("Installed sit to wait tweak"sv);
 	}
@@ -542,7 +545,7 @@ namespace NoCheatMode
 	{
 		static void Install()
 		{
-			REL::Relocation<std::uintptr_t> func{ REL::ID(22339) };
+			REL::Relocation<std::uintptr_t> func{ REL::Offset(0x325CC0) };
 			stl::asm_replace<GodMode>(func.address());
 		}
 
@@ -561,7 +564,7 @@ namespace NoCheatMode
 	{
 		static void Install()
 		{
-			REL::Relocation<std::uintptr_t> func{ REL::ID(22340) };
+			REL::Relocation<std::uintptr_t> func{ REL::Offset(0x325D20) };
 			stl::asm_replace<ImmortalMode>(func.address());
 		}
 
@@ -678,7 +681,7 @@ namespace LoadDoorPrompt
 					const auto linkedRef = linkedDoor.get();
 					const auto linkedCell = linkedRef ? linkedRef->GetSaveParentCell() : nullptr;
 					if (linkedCell && linkedCell->IsExteriorCell()) {
-						const auto prompt = Settings::GetSingleton()->tweaks.loadDoorPrompt;
+						const auto& prompt = Settings::GetSingleton()->tweaks.loadDoorPrompt;
 						return { kInterior, prompt.type.value == 2 ?
                                                 cell->GetName() :
                                                 a_cellName };
@@ -727,7 +730,7 @@ namespace LoadDoorPrompt
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::ID(17522) };
+		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x23C870) };
 
 		stl::write_thunk_call<Locked>(target.address() + 0x140);
 		stl::write_thunk_call<Normal>(target.address() + 0x168);
@@ -760,7 +763,7 @@ namespace NoPoisonPrompt
 
 	inline void Install(std::uint32_t a_type)
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::ID(39406) };
+		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x6CA3B0) };
 
 		switch (a_type) {
 		case 1:

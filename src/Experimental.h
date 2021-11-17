@@ -39,13 +39,13 @@ namespace GameTimers
 		static void UpdateTimers(RE::PlayerCharacter* a_player)
 		{
 			using func_t = decltype(&UpdateTimers);
-			REL::Relocation<func_t> func{ REL::ID(39410) };
+			REL::Relocation<func_t> func{ REL::Offset(0x6CA780) };
 			return func(a_player);
 		}
 
 		static bool& get_sleeping()
 		{
-			REL::Relocation<bool*> sleeping{ REL::ID(509271) };
+			REL::Relocation<bool*> sleeping{ REL::Offset(0x1E84C18) };
 			return *sleeping;
 		}
 
@@ -72,7 +72,7 @@ namespace GameTimers
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> func{ REL::ID(55352) };
+		REL::Relocation<std::uintptr_t> func{ REL::Offset(0x9B03B0) };
 		stl::asm_replace<SetGlobal>(func.address());
 
 		logger::info("Installed game hour timer fix"sv);
