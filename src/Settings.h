@@ -9,7 +9,7 @@ public:
 		return std::addressof(singleton);
 	}
 
-	size_t Load()
+	[[nodiscard]] size_t Load()
 	{
 		size_t trampolineSpace = 0;
 

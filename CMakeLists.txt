@@ -33,7 +33,7 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STR
 
 project(
 	po3_Tweaks
-	VERSION 1.4.1
+	VERSION 1.4.2
 	LANGUAGES CXX
 )
 
@@ -88,9 +88,7 @@ else ()
 	)
 endif ()
 
-find_package(spdlog REQUIRED CONFIG)
-find_package(xbyak REQUIRED CONFIG)
-
+find_package(robin_hood CONFIG REQUIRED)
 find_path(SIMPLEINI_INCLUDE_DIRS "ConvertUTF.c")
 
 # ---- Add source files ----
@@ -149,8 +147,7 @@ target_link_libraries(
 	${PROJECT_NAME}
 	PRIVATE
 		CommonLibSSE::CommonLibSSE
-		spdlog::spdlog
-		xbyak::xbyak
+		robin_hood::robin_hood
 )
 
 target_precompile_headers(

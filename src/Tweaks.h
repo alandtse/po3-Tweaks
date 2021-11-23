@@ -17,7 +17,7 @@ namespace FactionStealing
 			static std::int32_t GetFavorCost(RE::TESNPC* a_player, RE::TESNPC* a_owner)
 			{
 				using func_t = decltype(&GetFavorCost);
-				REL::Relocation<func_t> func{ REL::Offset(0x35C2F0) };
+				REL::Relocation<func_t> func{ REL::ID(24078) };
 				return func(a_player, a_owner);
 			}
 
@@ -76,7 +76,7 @@ namespace FactionStealing
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> func{ REL::Offset(0x6DC290) };
+		REL::Relocation<std::uintptr_t> func{ REL::ID(40670) };
 		stl::asm_replace<CanTake>(func.address());
 
 		logger::info("Installed faction stealing tweak"sv);
@@ -105,7 +105,7 @@ namespace AIFadeOut
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x23C1F0) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(17922) };
 		stl::write_thunk_call<GetFadeState>(target.address() + 0x3DE);
 
 		logger::info("Installed load door fade out tweak"sv);
@@ -133,7 +133,7 @@ namespace VoiceModulation
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x60E8E0) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(37542) };
 		stl::write_thunk_call<SetObjectToFollow>(target.address() + 0x7A2);
 
 		logger::info("Installed voice modulation tweak"sv);
@@ -162,17 +162,17 @@ namespace DopplerShift
 			return true;
 		}
 
-		static DWORD Play(RE::BSAudioManager* a_manager, std::int32_t a_soundID)
+		static void Play(RE::BSAudioManager* a_manager, std::int32_t a_soundID)
 		{
 			using func_t = decltype(&Play);
-			REL::Relocation<func_t> func{ REL::Offset(0xC144A0) };
+			REL::Relocation<func_t> func{ REL::ID(67671) };
 			return func(a_manager, a_soundID);
 		}
 
-		static DWORD Play3D(RE::BSAudioManager* a_manager, std::int32_t a_soundID, std::uint32_t a_unk03)
+		static void PlayAfter(RE::BSAudioManager* a_manager, std::int32_t a_soundID, std::uint32_t a_unk03)
 		{
-			using func_t = decltype(&Play3D);
-			REL::Relocation<func_t> func{ REL::Offset(0xC144F0) };
+			using func_t = decltype(&PlayAfter);
+			REL::Relocation<func_t> func{ REL::ID(67672) };
 			return func(a_manager, a_soundID, a_unk03);
 		}
 	};
@@ -181,7 +181,7 @@ namespace DopplerShift
 	{
 		static void Install()
 		{
-			REL::Relocation<std::uintptr_t> func{ REL::Offset(0xC12290) };
+			REL::Relocation<std::uintptr_t> func{ REL::ID(67616) };
 			stl::asm_replace<DefaultSound>(func.address());  //BSSoundHandle::PlaySound
 		}
 
@@ -198,14 +198,14 @@ namespace DopplerShift
 	{
 		static void Install()
 		{
-			REL::Relocation<std::uintptr_t> func{ REL::Offset(0xC122D0) };
+			REL::Relocation<std::uintptr_t> func{ REL::ID(67617) };
 			stl::asm_replace<Dialogue>(func.address());  //BSSoundHandle::PlaySound3D
 		}
 
 		static bool func(RE::BSSoundHandle& a_handle, std::uint32_t a_unk02)
 		{
 			return detail::PlayHandle(a_handle, [&](std::int32_t a_soundID) {
-				detail::Play3D(RE::BSAudioManager::GetSingleton(), a_soundID, a_unk02);
+				detail::PlayAfter(RE::BSAudioManager::GetSingleton(), a_soundID, a_unk02);
 			});
 		}
 		static inline constexpr std::size_t size = 0x46;
@@ -438,7 +438,7 @@ namespace ScreenshotToConsole
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x5E7150) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(36853) };
 		stl::write_thunk_call<DebugNotification>(target.address() + 0x9E);
 
 		logger::info("Installed screenshot to console tweak"sv);
@@ -455,7 +455,7 @@ namespace NoCritSneakMessage
 
 	inline void Install(std::uint32_t a_type)
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x64BAB0) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(38586) };
 
 		switch (a_type) {
 		case 1:
@@ -491,14 +491,14 @@ namespace SitToWait
 		static bool ProcessMenu(const RE::BSFixedString& a_menuName, RE::UI_MESSAGE_TYPE a_type, bool a_unk03)
 		{
 			using func_t = decltype(&ProcessMenu);
-			REL::Relocation<func_t> func{ REL::Offset(0xF09AD0) };
+			REL::Relocation<func_t> func{ REL::ID(82180) };
 			return func(a_menuName, a_type, a_unk03);
 		}
 
 		static bool CanSleepWait(RE::PlayerCharacter* a_player, RE::TESObjectREFR* a_furniture)
 		{
 			using func_t = decltype(&CanSleepWait);
-			REL::Relocation<func_t> func{ REL::Offset(0x6C5130) };
+			REL::Relocation<func_t> func{ REL::ID(40443) };
 			return func(a_player, a_furniture);
 		}
 
@@ -532,7 +532,7 @@ namespace SitToWait
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x8D9710) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(52249) };
 		stl::write_thunk_call<HandleWaitRequest>(target.address() + 0x379);
 
 		logger::info("Installed sit to wait tweak"sv);
@@ -545,7 +545,7 @@ namespace NoCheatMode
 	{
 		static void Install()
 		{
-			REL::Relocation<std::uintptr_t> func{ REL::Offset(0x325CC0) };
+			REL::Relocation<std::uintptr_t> func{ REL::ID(22814) };
 			stl::asm_replace<GodMode>(func.address());
 		}
 
@@ -564,7 +564,7 @@ namespace NoCheatMode
 	{
 		static void Install()
 		{
-			REL::Relocation<std::uintptr_t> func{ REL::Offset(0x325D20) };
+			REL::Relocation<std::uintptr_t> func{ REL::ID(22815) };
 			stl::asm_replace<ImmortalMode>(func.address());
 		}
 
@@ -730,7 +730,7 @@ namespace LoadDoorPrompt
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x23C870) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(17923) };
 
 		stl::write_thunk_call<Locked>(target.address() + 0x140);
 		stl::write_thunk_call<Normal>(target.address() + 0x168);
@@ -763,7 +763,7 @@ namespace NoPoisonPrompt
 
 	inline void Install(std::uint32_t a_type)
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x6CA3B0) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(40481) };
 
 		switch (a_type) {
 		case 1:

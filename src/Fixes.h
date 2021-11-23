@@ -26,7 +26,7 @@ namespace QueuedRefCrash
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> func{ REL::Offset(0x27E570) };
+		REL::Relocation<std::uintptr_t> func{ REL::ID(19116) };
 		stl::asm_replace<SetFadeNode>(func.address());
 
 		logger::info("Installed queued ref crash fix"sv);
@@ -56,7 +56,7 @@ namespace MapMarker
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x913140) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(53095) };
 		stl::write_thunk_call<IsFastTravelEnabled>(target.address() + 0x328);
 
 		logger::info("Installed map marker placement fix"sv);
@@ -89,7 +89,7 @@ namespace CantTakeBook
 
 		inline void Install()
 		{
-			REL::Relocation<std::uintptr_t> target{ REL::Offset(0x885C70) };
+			REL::Relocation<std::uintptr_t> target{ REL::ID(51057) };
 			stl::write_thunk_call<ShowTakeButton>(target.address() + 0x636);
 		}
 	}
@@ -159,7 +159,7 @@ namespace ProjectileRange
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x7821A0) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(44222) };
 		stl::write_thunk_call<UpdateCombatThreat>(target.address() + 0x79D);
 
 		logger::info("Installed projectile range fix"sv);
@@ -186,7 +186,7 @@ namespace CombatDialogue
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x7A0940)};
+		REL::Relocation<std::uintptr_t> target{ REL::ID(44803) };
 		stl::write_thunk_call<SayCombatDialogue>(target.address() + 0x135);
 
 		logger::info("Installed combat dialogue fix"sv);
@@ -199,7 +199,7 @@ namespace Spells
 {
 	namespace detail
 	{
-		struct SpellApplyStruct
+		struct PermanentMagicFunctor
 		{
 			RE::MagicCaster* caster{ nullptr };
 			RE::Actor* actor{ nullptr };
@@ -209,12 +209,12 @@ namespace Spells
 			std::uint8_t pad13{ 0 };
 			std::uint32_t pad14{ 0 };
 		};
-		static_assert(sizeof(SpellApplyStruct) == 0x18);
+		static_assert(sizeof(PermanentMagicFunctor) == 0x18);
 
-		inline bool ApplySpell(SpellApplyStruct& a_applier, RE::SpellItem* a_spell)
+		inline bool Apply(PermanentMagicFunctor& a_applier, RE::SpellItem* a_spell)
 		{
-			using func_t = decltype(&ApplySpell);
-			REL::Relocation<func_t> func{ REL::Offset(0x56CE20) };
+			using func_t = decltype(&Apply);
+			REL::Relocation<func_t> func{ REL::ID(34464) };
 			return func(a_applier, a_spell);
 		}
 	}
@@ -230,10 +230,10 @@ namespace Spells
                                         actor->GetMagicCaster(RE::MagicSystem::CastingSource::kInstant) :
                                         nullptr;
 				if (caster) {
-					detail::SpellApplyStruct applier{ caster, actor };
+					detail::PermanentMagicFunctor applier{ caster, actor };
 					applier.flags = applier.flags & 0xF9 | 1;
 					for (const auto& spell : actor->addedSpells) {
-						ApplySpell(applier, spell);
+						Apply(applier, spell);
 					}
 				}
 				return func(a_list);
@@ -243,7 +243,7 @@ namespace Spells
 
 		inline void Install()
 		{
-			REL::Relocation<std::uintptr_t> target{ REL::Offset(0x657450)};
+			REL::Relocation<std::uintptr_t> target{ REL::ID(38753) };
 			stl::write_thunk_call<GetAliasInstanceArray>(target.address() + 0x115);
 		}
 	}
@@ -270,7 +270,7 @@ namespace Spells
 
 		inline void Install()
 		{
-			REL::Relocation<std::uintptr_t> target{ REL::Offset(0x657610) };
+			REL::Relocation<std::uintptr_t> target{ REL::ID(38754) };
 			stl::write_thunk_call<GetAliasInstanceArray>(target.address() + 0x131);
 		}
 	}
@@ -286,7 +286,7 @@ namespace Spells
                                         a_actor->GetMagicCaster(RE::MagicSystem::CastingSource::kInstant) :
                                         nullptr;
 				if (caster) {
-					detail::SpellApplyStruct applier{ caster, a_actor };
+					detail::PermanentMagicFunctor applier{ caster, a_actor };
 					applier.flags = applier.flags & 0xF9 | 1;
 
 					const auto has_no_dispel_flag = [&](const RE::SpellItem& a_spell) {
@@ -302,7 +302,7 @@ namespace Spells
 						const std::span span(actorEffects->spells, actorEffects->numSpells);
 						for (const auto& spell : span) {
 							if (spell && has_no_dispel_flag(*spell)) {
-								ApplySpell(applier, spell);
+								Apply(applier, spell);
 							}
 						}
 					}
@@ -310,7 +310,7 @@ namespace Spells
 					if (Settings::GetSingleton()->fixes.addedSpell.value) {
 						for (const auto& spell : a_actor->addedSpells) {
 							if (spell && has_no_dispel_flag(*spell)) {
-								ApplySpell(applier, spell);
+								Apply(applier, spell);
 							}
 						}
 					}
@@ -322,7 +322,7 @@ namespace Spells
 
 		inline void Install()
 		{
-			REL::Relocation<std::uintptr_t> target{ REL::Offset(0x5F28F0) };
+			REL::Relocation<std::uintptr_t> target{ REL::ID(37177) };
 			stl::write_thunk_call<Load3D>(target.address() + 0xD);
 
 			logger::info("Installed no death dispel spell reapply fix"sv);
@@ -340,7 +340,7 @@ namespace IsFurnitureAnimTypeFix
 			static std::uint32_t GetEquippedFurnitureType(RE::Actor* a_actor)
 			{
 				using func_t = decltype(&GetEquippedFurnitureType);
-				REL::Relocation<func_t> func{ REL::Offset(0x622330) };
+				REL::Relocation<func_t> func{ REL::ID(37732) };
 				return func(a_actor);
 			}
 
@@ -397,7 +397,7 @@ namespace IsFurnitureAnimTypeFix
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> func{ REL::Offset(0x2F2E00) };
+		REL::Relocation<std::uintptr_t> func{ REL::ID(21668) };
 		stl::asm_replace<IsFurnitureAnimType>(func.address());
 
 		logger::info("Installed IsFurnitureAnimType fix"sv);
@@ -437,7 +437,7 @@ namespace AttachLightCrash
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> func{ REL::Offset(0x566B40) };
+		REL::Relocation<std::uintptr_t> func{ REL::ID(34388) };
 		stl::asm_replace<AttachLightHitEffectVisitor>(func.address());
 
 		logger::info("Installed light attach crash fix"sv);
@@ -542,7 +542,7 @@ namespace GetEquippedFix
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> func{ REL::Offset(0x2EE380) };
+		REL::Relocation<std::uintptr_t> func{ REL::ID(21536) };
 		stl::asm_replace<GetEquipped>(func.address());
 
 		logger::info("Installed GetEquipped fix"sv);
@@ -554,7 +554,7 @@ namespace EffectShaderZBufferFix
 {
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x1E48C08) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(360087) };
 
 		constexpr std::uint8_t zeroes[] = { 0x0, 0x0, 0x0, 0x0 };
 		REL::safe_write(target.address() + 0x1C, zeroes, 4);
@@ -575,13 +575,13 @@ namespace ToggleCollisionFix
 			static void ToggleGlobalCollision()
 			{
 				using func_t = decltype(&ToggleGlobalCollision);
-				REL::Relocation<func_t> func{ REL::Offset(0x1618F0) };
+				REL::Relocation<func_t> func{ REL::ID(13375) };
 				return func();
 			}
 
 			static bool& get_collision_state()
 			{
-				REL::Relocation<bool*> collision_state{ REL::Offset(0x1F59354) };
+				REL::Relocation<bool*> collision_state{ REL::ID(400334) };
 				return *collision_state;
 			}
 		};
@@ -687,10 +687,10 @@ namespace ToggleCollisionFix
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x5FCF20) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(37350) };
 		stl::write_thunk_call<ApplyMovementDelta>(target.address() + 0xFB);
 
-		REL::Relocation<std::uintptr_t> func{ REL::Offset(0x3260B0) };
+		REL::Relocation<std::uintptr_t> func{ REL::ID(22825) };
 		stl::asm_replace<ToggleCollision>(func.address());
 
 		logger::info("Installed toggle collision fix"sv);
