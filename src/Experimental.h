@@ -158,7 +158,7 @@ namespace ModifySuspendedStackFlushTimeout
 
 					push(rax);
 
-					mov(rax, stl::unrestricted_cast<std::uintptr_t>(std::addressof(VAL)));
+					mov(rax, std::uintptr_t(std::addressof(VAL)));
 					mulss(xmm0, ptr[rax]);
 
 					pop(rax);
